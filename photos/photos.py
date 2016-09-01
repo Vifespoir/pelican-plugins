@@ -15,6 +15,8 @@ from pelican.settings import DEFAULT_CONFIG
 from pelican import signals
 from pelican.utils import pelican_open
 
+from photos.carousel import carousel
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +32,7 @@ except ImportError:
 
 def initialized(pelican):
 
-    p = os.path.expanduser('~/Pictures')
+    p = os.path.expanduser('/home/vifespoir/github/pelican-blog/content/photos')
 
     DEFAULT_CONFIG.setdefault('PHOTO_LIBRARY', p)
     DEFAULT_CONFIG.setdefault('PHOTO_GALLERY', (1024, 768, 80))
@@ -96,7 +98,6 @@ def isalpha(img):
 
 def ReduceOpacity(im, opacity):
     """Reduces Opacity
-
     Returns an image with reduced opacity.
     Taken from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/362879
     """
@@ -158,6 +159,7 @@ def watermark_photo(image, watermark_text, watermark_image, watermark_image_size
 def resize_worker(orig, resized, spec, wm, wm_text, wm_img, wm_img_size):
     logger.info('photos: make photo {} -> {}'.format(orig, resized))
     im = Image.open(orig)
+    im = carousel(im)
     try:
         exif = im._getexif()
     except:
@@ -241,7 +243,6 @@ def detect_content(content):
         regex = r"""
             (?P<markup><\s*[^\>]*  # match tag with src and href attr
                 (?:href|src)\s*=)
-
             (?P<quote>["\'])      # require value to be quoted
             (?P<path>{0}(?P<value>.*?))  # the url value
             \2""".format(content.settings['INTRASITE_LINK_REGEX'])
